@@ -71,6 +71,9 @@
       </div>
     </div>
     
+    <!-- Audio Bubu Dudu -->
+    <audio id="bg-audio" src="bubududu.mp3" loop preload="auto"></audio>
+    
     <script>
         console.log('Game with animated GIFs started!');
         
@@ -246,6 +249,17 @@
             });
           });
         }
+        
+        // Audio logic: autoplay dengan fallback sentuhan/klik
+        const audio = document.getElementById('bg-audio');
+        function tryPlayAudio() {
+          audio.volume = 0.7;
+          audio.play().catch(()=>{});
+        }
+        window.addEventListener('load', tryPlayAudio);
+        // Fallback: play audio saat user pertama kali sentuh/klik layar
+        document.body.addEventListener('touchstart', tryPlayAudio, {once:true});
+        document.body.addEventListener('click', tryPlayAudio, {once:true});
     </script>
 </body>
 </html>
