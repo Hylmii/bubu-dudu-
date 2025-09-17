@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dudu & Bubu Game</title>
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(to bottom, #87CEEB 60%, #90EE90 40%);
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        
+        .character {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+        }
+        
+        .character img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        #dudu {
+            left: 100px;
+            bottom: 100px;
+        }
+        
+        #bubu {
+            right: 100px;
+            bottom: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div id="dudu" class="character">
+        <img id="duduImg" src="hehehehe.gif" alt="Dudu">
+    </div>
+    
+    <div id="bubu" class="character">
+        <img id="bubuImg" src="bubu-talking-to-angrying.gif" alt="Bubu">
+    </div>
+    
+    <script>
+        console.log('Game with animated GIFs started!');
+        
+        const dudu = document.getElementById('dudu');
+        const bubu = document.getElementById('bubu');
+        const duduImg = document.getElementById('duduImg');
+        const bubuImg = document.getElementById('bubuImg');
+        
+        let duduPos = {x: 100, y: 100};
+        let bubuPos = {x: window.innerWidth - 220, y: 100};
+        
+        const keys = {};
+        let duduMoving = false;
+        let bubuMoving = false;
+        let bubuLastDirection = 1; // 1 = kanan, -1 = kiri
+        
+        // Animation states
+        const animations = {
+            dudu: {
+                idle: 'hehehehe.gif',
+                moving: 'boo-dudu-drive.gif'
+            },
+            bubu: {
+                idle: 'bubu-talking-to-angrying.gif',
+                moving: 'bubu-dudu-sseeyall.gif'
+            }
+        };
+        
+        function updateAnimations() {
+            // Update Dudu animation
+            if (duduMoving && duduImg.src.includes('hehehehe.gif')) {
+                duduImg.src = animations.dudu.moving;
+                console.log('Dudu bergerak!');
+            } else if (!duduMoving && duduImg.src.includes('boo-dudu-drive.gif')) {
+                duduImg.src = animations.dudu.idle;
+                console.log('Dudu diam');
+            }
+            
+            // Update Bubu animation
+            if (bubuMoving && bubuImg.src.includes('bubu-talking-to-angrying.gif')) {
+                bubuImg.src = animations.bubu.moving;
+                console.log('Bubu bergerak!');
+            } else if (!bubuMoving && bubuImg.src.includes('bubu-dudu-sseeyall.gif')) {
+                bubuImg.src = animations.bubu.idle;
+                // Tetap hadap ke arah terakhir
+                bubuImg.style.transform = bubuLastDirection === 1 ? 'scaleX(1)' : 'scaleX(-1)';
+                console.log('Bubu diam');
+            }
+        }
+        
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            if (['w', 'a', 's', 'd'].includes(key) || e.key.startsWith('Arrow')) {
+                e.preventDefault();
+                keys[key] = true;
+                keys[e.key] = true;
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+            keys[key] = false;
+            keys[e.key] = false;
+        });
+        
+        // Smooth animation loop
+        function gameLoop() {
+            let moved = false;
+            duduMoving = false;
+            bubuMoving = false;
+            
+            // Dudu movement (WASD) - Smooth continuous movement
+            if (keys['w']) {
+                duduPos.y += 8;
+                duduMoving = true;
+                moved = true;
+            }
+            if (keys['s']) {
+                duduPos.y -= 8;
+                duduMoving = true;
+                moved = true;
+            }
+            if (keys['a']) {
+                duduPos.x -= 8;
+                duduMoving = true;
+                moved = true;
+                // Flip Dudu to face left (normal)
+                duduImg.style.transform = 'scaleX(1)';
+            }
+            if (keys['d']) {
+                duduPos.x += 8;
+                duduMoving = true;
+                moved = true;
+                // Flip Dudu to face right
+                duduImg.style.transform = 'scaleX(-1)';
+            }
+            
+            // Bubu movement (Arrow keys) - Smooth continuous movement
+            if (keys['ArrowUp']) {
+                bubuPos.y += 8;
+                bubuMoving = true;
+                moved = true;
+            }
+            if (keys['ArrowDown']) {
+                bubuPos.y -= 8;
+                bubuMoving = true;
+                moved = true;
+            }
+            if (keys['ArrowLeft']) {
+                bubuPos.x -= 8;
+                bubuMoving = true;
+                moved = true;
+                bubuImg.style.transform = 'scaleX(-1)';
+                bubuLastDirection = -1;
+            }
+            if (keys['ArrowRight']) {
+                bubuPos.x += 8;
+                bubuMoving = true;
+                moved = true;
+                bubuImg.style.transform = 'scaleX(1)';
+                bubuLastDirection = 1;
+            }
+            
+            // Keep in bounds
+            duduPos.x = Math.max(0, Math.min(window.innerWidth - 120, duduPos.x));
+            duduPos.y = Math.max(0, Math.min(window.innerHeight - 120, duduPos.y));
+            bubuPos.x = Math.max(0, Math.min(window.innerWidth - 120, bubuPos.x));
+            bubuPos.y = Math.max(0, Math.min(window.innerHeight - 120, bubuPos.y));
+            
+            // Apply positions
+            dudu.style.left = duduPos.x + 'px';
+            dudu.style.bottom = duduPos.y + 'px';
+            bubu.style.left = bubuPos.x + 'px';
+            bubu.style.bottom = bubuPos.y + 'px';
+            
+            // Update animations
+            updateAnimations();
+            
+            // Continue the loop
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Initial positioning
+        dudu.style.left = duduPos.x + 'px';
+        dudu.style.bottom = duduPos.y + 'px';
+        bubu.style.left = bubuPos.x + 'px';
+        bubu.style.bottom = bubuPos.y + 'px';
+        
+        // Start the smooth animation loop
+        gameLoop();
+        
+        console.log('Smooth animated game ready!');
+        console.log('Dudu idle: hehehehe.gif, moving: boo-dudu-drive.gif');
+        console.log('Bubu idle: bubu-talking-to-angrying.gif, moving: bubu-dudu-sseeyall.gif');
+    </script>
+</body>
+</html>
