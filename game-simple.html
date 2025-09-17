@@ -32,6 +32,14 @@
             right: 100px;
             bottom: 100px;
         }
+        
+        .tc-btn {
+            width: 48px; height: 48px; margin: 2px; font-size: 24px; border-radius: 12px; border: none; background: #222; color: #fff; opacity: 0.8;
+            box-shadow: 0 2px 8px #0003; pointer-events:auto;
+        }
+        @media (max-width: 800px) {
+            #touch-controls { display: block !important; }
+        }
     </style>
 </head>
 <body>
@@ -41,6 +49,26 @@
     
     <div id="bubu" class="character">
         <img id="bubuImg" src="bubu-talking-to-angrying.gif" alt="Bubu">
+    </div>
+    
+    <!-- Kontrol sentuh hanya untuk HP -->
+    <div id="touch-controls" style="display:none; position:fixed; left:0; right:0; bottom:10px; z-index:1000; pointer-events:none;">
+      <div style="display:flex; justify-content:space-between; width:100vw;">
+        <!-- Dudu Controls (WASD) -->
+        <div id="dudu-touch" style="margin-left:10px; pointer-events:auto;">
+          <button class="tc-btn" data-key="w">▲</button><br>
+          <button class="tc-btn" data-key="a">◀</button>
+          <button class="tc-btn" data-key="s">▼</button>
+          <button class="tc-btn" data-key="d">▶</button>
+        </div>
+        <!-- Bubu Controls (Arrow) -->
+        <div id="bubu-touch" style="margin-right:10px; pointer-events:auto;">
+          <button class="tc-btn" data-key="ArrowUp">▲</button><br>
+          <button class="tc-btn" data-key="ArrowLeft">◀</button>
+          <button class="tc-btn" data-key="ArrowDown">▼</button>
+          <button class="tc-btn" data-key="ArrowRight">▶</button>
+        </div>
+      </div>
     </div>
     
     <script>
@@ -197,6 +225,27 @@
         console.log('Smooth animated game ready!');
         console.log('Dudu idle: hehehehe.gif, moving: boo-dudu-drive.gif');
         console.log('Bubu idle: bubu-talking-to-angrying.gif, moving: bubu-dudu-sseeyall.gif');
+        
+        // Tampilkan tombol sentuh hanya di HP
+        function isMobile() {
+          return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth < 800 && 'ontouchstart' in window);
+        }
+        if (isMobile()) {
+          document.getElementById('touch-controls').style.display = 'block';
+          // Event sentuh untuk tombol
+          document.querySelectorAll('.tc-btn').forEach(btn => {
+            btn.addEventListener('touchstart', function(e) {
+              const k = btn.getAttribute('data-key');
+              keys[k] = true;
+              e.preventDefault();
+            });
+            btn.addEventListener('touchend', function(e) {
+              const k = btn.getAttribute('data-key');
+              keys[k] = false;
+              e.preventDefault();
+            });
+          });
+        }
     </script>
 </body>
 </html>
