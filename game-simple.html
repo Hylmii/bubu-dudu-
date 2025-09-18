@@ -73,7 +73,9 @@
     
     <!-- Audio Bubu Dudu -->
     <audio id="bg-audio" src="bubududu.mp3" loop preload="auto"></audio>
-    
+    <button id="audio-toggle" style="position:fixed; left:10px; bottom:10px; z-index:2000; width:44px; height:44px; border-radius:50%; border:none; background:#222c; color:#fff; font-size:22px; display:flex; align-items:center; justify-content:center;">
+      ▶️
+    </button>
     <script>
         console.log('Game with animated GIFs started!');
         
@@ -250,16 +252,27 @@
           });
         }
         
-        // Audio logic: autoplay dengan fallback sentuhan/klik
+        // Audio logic: tombol play/pause
         const audio = document.getElementById('bg-audio');
-        function tryPlayAudio() {
-          audio.volume = 0.7;
-          audio.play().catch(()=>{});
+        const audioBtn = document.getElementById('audio-toggle');
+        let audioPlaying = false;
+        function updateAudioBtn() {
+          audioBtn.innerHTML = audioPlaying ? '⏸️' : '▶️';
         }
-        window.addEventListener('load', tryPlayAudio);
-        // Fallback: play audio saat user pertama kali sentuh/klik layar
-        document.body.addEventListener('touchstart', tryPlayAudio, {once:true});
-        document.body.addEventListener('click', tryPlayAudio, {once:true});
+        audioBtn.addEventListener('click', function() {
+          if (audioPlaying) {
+            audio.pause();
+            audioPlaying = false;
+          } else {
+            audio.play();
+            audioPlaying = true;
+          }
+          updateAudioBtn();
+        });
+        audio.volume = 0.7;
+        audio.addEventListener('pause', ()=>{audioPlaying=false;updateAudioBtn();});
+        audio.addEventListener('play', ()=>{audioPlaying=true;updateAudioBtn();});
+        updateAudioBtn();
     </script>
 </body>
 </html>
